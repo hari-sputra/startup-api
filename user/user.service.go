@@ -10,6 +10,7 @@ type UserService interface {
 	RegisterUser(input RegisterUserInput) (User, error)
 	LoginUser(input LoginUserInput) (User, error)
 	IsEmailAvailable(input CheckEmailInput) (bool, error)
+	SaveAvatar(id int, fileLocation string) (User, error)
 }
 
 type userService struct {
@@ -78,4 +79,20 @@ func (s *userService) IsEmailAvailable(input CheckEmailInput) (bool, error) {
 	}
 
 	return false, nil
+}
+
+func (s *userService) SaveAvatar(id int, fileLocation string) (User, error) {
+	user, err := s.userRepository.FindById(id)
+	if err != nil {
+		return user, err
+	}
+
+	user.Avatar = fileLocation
+
+	updateUser, err := s.userRepository.Update(user)
+	if err != nil {
+		return updateUser, err
+	}
+
+	return updateUser, nil
 }

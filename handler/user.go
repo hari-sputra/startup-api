@@ -1,11 +1,14 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
+	"path/filepath"
 	"startup-api/helper"
 	"startup-api/user"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type userHandler struct {
@@ -106,6 +109,52 @@ func (h *userHandler) CheckAvailableEmail(c *gin.Context) {
 	}
 
 	res := helper.APIResponse(metaMsg, http.StatusOK, "success", data)
+
+	c.JSON(http.StatusOK, res)
+}
+
+func (h *userHandler) UploadAvatar(c *gin.Context) {
+	file, err := c.FormFile("avatar")
+	if err != nil {
+		data := gin.H{
+			"is_uploaded": false,
+		}
+
+		res := helper.APIResponse("Failed to upload avatar", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	uniqueFileName := fmt.Sprintf("%s%s", uuid.New().String(), filepath.Ext(file.Filename))
+	path := "storage/images/" + uniqueFileName
+
+	err = c.SaveUploadedFile(file, path)
+	if err != nil {
+		data := gin.H{
+			"is_uploaded": false,
+		}
+
+		res := helper.APIResponse("Failed to save avatar", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	// temp id
+	userID := 16
+
+	_, err = h.userService.SaveAvatar(userID, path)
+	if err != nil {
+		data := gin.H{
+			"is_uploaded": false,
+		}
+
+		res := helper.APIResponse("Failed to save avatar path", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	data := gin.H{"is_uploaded": true}
+	res := helper.APIResponse("Avatar uploaded successfully", http.StatusOK, "success", data)
 
 	c.JSON(http.StatusOK, res)
 }
