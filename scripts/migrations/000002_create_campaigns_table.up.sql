@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS campaigns (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    title_description VARCHAR(255) NOT NULL,
+    description LONGTEXT NOT NULL,
+    goal_amount BIGINT NOT NULL,
+    current_amount BIGINT NOT NULL,
+    perks TEXT NOT NULL,
+    backer_count BIGINT NOT NULL,
+    slug VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
