@@ -1,4 +1,10 @@
-export MYSQL_URL='mysql://root:password@tcp(localhost:3306)/startup_app'
+# Memuat file .env jika ada
+ifeq (,$(wildcard .env))
+    $(error ".env file not found!")
+endif
+
+include .env
+export $(shell sed 's/=.*//' .env)
 
 migrate-create:
 	@ migrate create -ext sql -dir scripts/migrations -seq $(name)

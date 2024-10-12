@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"errors"
 	"os"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -10,6 +11,7 @@ var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
 type AuthService interface {
 	GenerateJWTToken(userID int) (string, error)
+	ValidateJWTToken(token string) (*jwt.Token, error)
 }
 
 type jwtService struct {
@@ -32,4 +34,23 @@ func (s *jwtService) GenerateJWTToken(userID int) (string, error) {
 
 	return signedToken, nil
 
+}
+
+func (s *jwtService) ValidateJWTToken(token string) (*jwt.Token, error) {
+
+	keyFunc := func(token *jwt.Token) (interface{}, error) {
+		_, ok := token.Method.(*jwt.SigningMethodHMAC)
+		if !ok {
+			return nil, errors.New("invalid token")
+		}
+
+		return []byte(jwtSecret), nil
+	}
+
+	t, err := jwt.Parse(token, keyFunc)
+	if err != nil {
+		return t, err
+	}
+
+	return t, nil
 }
