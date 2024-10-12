@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"path/filepath"
+	"startup-api/auth"
 	"startup-api/helper"
 	"startup-api/user"
 
@@ -13,10 +14,11 @@ import (
 
 type userHandler struct {
 	userService user.UserService
+	authService auth.AuthService
 }
 
-func NewUserHandler(userService user.UserService) *userHandler {
-	return &userHandler{userService}
+func NewUserHandler(userService user.UserService, authService auth.AuthService) *userHandler {
+	return &userHandler{userService, authService}
 }
 
 func (h *userHandler) RegisterUser(c *gin.Context) {
@@ -42,7 +44,14 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	formatter := user.FormatterData(createUser, "token1223")
+	token, err := h.authService.GenerateJWTToken(createUser.ID)
+	if err != nil {
+		res := helper.APIResponse("Create token failed", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	formatter := user.FormatterData(createUser, token)
 	res := helper.APIResponse("Account has been registered", http.StatusOK, "success", formatter)
 
 	c.JSON(http.StatusOK, res)
@@ -70,7 +79,14 @@ func (h *userHandler) LoginUser(c *gin.Context) {
 		return
 	}
 
-	formatter := user.FormatterData(loginUser, "token1234")
+	token, err := h.authService.GenerateJWTToken(loginUser.ID)
+	if err != nil {
+		res := helper.APIResponse("Create token failed", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	formatter := user.FormatterData(loginUser, token)
 	res := helper.APIResponse("User logged successfully", http.StatusOK, "success", formatter)
 
 	c.JSON(http.StatusOK, res)

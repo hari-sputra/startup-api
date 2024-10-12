@@ -34,7 +34,6 @@ func (s *userService) RegisterUser(input RegisterUserInput) (User, error) {
 
 	user.Password = string(passwordHash)
 	user.Role = "user"
-	user.Token = "1234567sus"
 
 	createUser, err := s.userRepository.Save(user)
 
