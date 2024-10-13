@@ -2,8 +2,8 @@ package auth
 
 import (
 	"net/http"
+	"startup-api/API/user"
 	"startup-api/helper"
-	"startup-api/user"
 	"strings"
 
 	"github.com/gin-gonic/gin"

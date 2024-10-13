@@ -1,9 +1,9 @@
 package router
 
 import (
+	"startup-api/API/user"
 	"startup-api/auth"
 	"startup-api/handler"
-	"startup-api/user"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

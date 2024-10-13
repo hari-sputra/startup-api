@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 	"path/filepath"
+	"startup-api/API/user"
 	"startup-api/auth"
 	"startup-api/helper"
-	"startup-api/user"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
