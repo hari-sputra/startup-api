@@ -155,8 +155,8 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 		return
 	}
 
-	// temp id
-	userID := 16
+	currentUser := c.MustGet("Current-User").(user.User)
+	userID := currentUser.ID
 
 	_, err = h.userService.SaveAvatar(userID, path)
 	if err != nil {
